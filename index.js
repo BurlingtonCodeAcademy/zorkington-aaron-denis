@@ -9,10 +9,15 @@ function ask(questionText) {
 
 // remember the StateMachine lecture
 // https://bootcamp.burlingtoncodeacademy.com/lessons/cs/state-machines
+
 let states = {
-  'roomOne': { canChangeTo: [ 'roomTwo' ] },
-  'roomTwo': { canChangeTo: [ 'roomThree' ] },
-  'roomThree': { canChangeTo: [ 'roomOne' ] }
+  'outside':   { canChangeTo: [ 'foyer' ]    },
+  'foyer':     { canChangeTo: [ 'stairway' ] },
+  'stairway':  { canChangeTo: [ 'hallway']   },
+  'hallway':   { canChangeTo: [ 'classroom'] },
+  'classroom': { canChangeTo: [ 'hallway']   },
+  'stairway':  { canChangeTo: [ 'foyer' ]    },
+  'foyer':     { canChangeTo: [ 'outside' ]  }
 };
 
 let currentState = "green";
@@ -29,11 +34,24 @@ function enterState(newState) {
 start();
 
 async function start() {
-  const welcomeMessage = `182 Main St.
+  const welcomeMessage = `
+182 Main St.
 You are standing on Main Street between Church and South Winooski.
 There is a door here. A keypad sits on the handle.
 On the door is a handwritten sign.`;
-  let answer = await ask(welcomeMessage);
-  console.log('Now write your code to make this work!');
-  process.exit();
+  const userPrompt = `\n>_`;
+  let userAnswer = await ask(welcomeMessage + userPrompt);
+  let userAnswerLC = userAnswer.toLowerCase(); 
+  if (userAnswerLC == 'gargle') {
+    console.log("Sorry, I don't know how to gargle.");
+  } else if (userAnswer.toLowerCase == 'read sign') {
+    console.log(
+      `The sign says "Welcome to Burlington Code Academy! Come on up to
+      the third floor. If the door is locked, use the code 12345."`);
+      return userPrompt  
+  } else { 
+    console.log("Sorry, I don't understand that.");
+    process.exit();
+  }
+  
 }
