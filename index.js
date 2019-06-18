@@ -1,3 +1,5 @@
+/* Denis Poirier - Proj 2 with Aaron - Zork/Zorkington */
+
 const readline = require('readline');
 const readlineInterface = readline.createInterface(process.stdin, process.stdout);
 
@@ -10,48 +12,63 @@ function ask(questionText) {
 // remember the StateMachine lecture
 // https://bootcamp.burlingtoncodeacademy.com/lessons/cs/state-machines
 
-let states = {
-  'outside':   { canChangeTo: [ 'foyer' ]    },
-  'foyer':     { canChangeTo: [ 'stairway' ] },
-  'stairway':  { canChangeTo: [ 'hallway']   },
-  'hallway':   { canChangeTo: [ 'classroom'] },
-  'classroom': { canChangeTo: [ 'hallway']   },
-  'stairway':  { canChangeTo: [ 'foyer' ]    },
-  'foyer':     { canChangeTo: [ 'outside' ]  }
+let rooms = {     // was given in starter code 
+  'outside':   { canMoveTo: [ 'foyer' ],    roomMessage: [ `182 Main St.
+  You are standing on Main Street between Church and South Winooski.
+  There is a door here. A keypad sits on the handle.
+  On the door is a handwritten sign. (If you wish to exit the game, at anytime, type
+    "exit")`], 
+    signMsg: [`The sign says "Welcome to Burlington Code Academy! Come on up to
+    the third floor. If the door is locked, use the code 12345."`], exitKey: [`12345`] },
+  'foyer':     { canMoveTo: [ `stairway` ], roomMessage: [`You are in foyer`],
+    signMsg: [`This sign says nothing.`],                           exitKey: [`exit1`] },
+  'stairway':  { canMoveTo: [ `hallway`],   roomMessage: [`You are in stairway`],
+    signMsg: [`This sign says nothing.`],                           exitKey: [`exit2`] },
+  'hallway':   { canMoveTo: [ 'classroom'], roomMessage: [`You are in hallway`],
+    signMsg: [`This sign says nothing.`],                           exitKey: [`exit3`] },
+  'classroom': { canMoveTo: [ 'hallway'],   roomMessage: [`You are in classroom!`],
+    signMsg: [`This sign says "classroom".`],                       exitKey: [`exit4`] }
 };
 
-let currentState = "green";
-
-function enterState(newState) {
-  let validTransitions = states[currentState].canChangeTo;
-  if (validTransitions.includes(newState)) {
-    currentState = newState;
+let currentRoom = 'outside';
+function enterRoom(newRoom) {
+  let validTransitions = rooms[currentRoom].canMoveTo;
+  if (validTransitions.includes(newRoom)) {
+    currentRoom = newRoom;
   } else {
-    throw 'Invalid state transition attempted - from ' + currentState + ' to ' + newState;
+    throw 'Invalid room transition attempted - from ' + currentRoom + ' to ' + newRoom;
   }
-}
+}  
+  /*
+let currentRoom = null;  // given: example of saving rooms in global variables
+function moveToRoom(newRoom) {
+  if (canMoveToRoom(newRoom)) {
+    currentRoom = newRoom;
+  }
+}   */ 
 
 start();
 
 async function start() {
-  const welcomeMessage = `
-182 Main St.
-You are standing on Main Street between Church and South Winooski.
-There is a door here. A keypad sits on the handle.
-On the door is a handwritten sign.`;
+
   const userPrompt = `\n>_`;
-  let userAnswer = await ask(welcomeMessage + userPrompt);
+  let userAnswer = await ask('outside'.roomMessage + userPrompt);
   let userAnswerLC = userAnswer.toLowerCase(); 
-  if (userAnswerLC == 'gargle') {
-    console.log("Sorry, I don't know how to gargle.");
-  } else if (userAnswer.toLowerCase == 'read sign') {
-    console.log(
-      `The sign says "Welcome to Burlington Code Academy! Come on up to
-      the third floor. If the door is locked, use the code 12345."`);
-      return userPrompt  
-  } else { 
-    console.log("Sorry, I don't understand that.");
-    process.exit();
+  while (userAnswerLC != 'exit') { 
+    if ((userAnswerLC == 'gargle') && (this.room == 'outside')) {
+      console.log(`Sorry, I don't know how to ` + userAnswerLC + `.` + userPrompt);
+    } else if (userAnswerLC == 'read sign') {
+      console.log(signMsg + userPrompt);    
+    } else if (userAnswerLC == this.exitKey) {
+        enterRoom();
+      // return;  
+    } else if (userAnswerLC == 'exit') { 
+      console.log("Thanks for playing.");
+      process.exit();
+    } 
+    userAnswer = await ask(this.roomMessage + userPrompt); // keeps on asking
+    userAnswerLC = userAnswer.toLowerCase(); // keeps lowercasing the answer 
   }
-  
-}
+}  // end of main pgm
+
+// functions should be last?
